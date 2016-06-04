@@ -3,67 +3,75 @@
 #include <stdlib.h>
 
 List* ListCreate() {
-	return calloc(1, sizeof(List));
+	return (List*)calloc(1, sizeof(List));
 }
 Node* ListCreateNode() {
-	return calloc(1, sizeof(Node));
+	return (Node*)calloc(1, sizeof(Node));
 }
 void ListFree(List** ppList) {
 	List* pList = *ppList;
 	while (pList->pHead != NULL) {
 		Node* pNode = ListPopHead(pList);
-		ListFreeNode(pList, &pNode);
+		ListFreeNode(&pNode);
 	}
 	pList->pTail = NULL;
 	free(pList);
 	*ppList = NULL;
 }
-void ListFreeNode(List* list, Node** ppNode) {
+void ListFreeNode(Node** ppNode) {
 	Node* pNode = *ppNode;
-	ListRemoveNode(list, pNode);
+	if (pNode != NULL) {
+		pNode->pNext = pNode->pPrev = pNode->pData = NULL;
+	}
 	free(pNode);
-	*ppNode = NULL;
+	pNode = NULL;
 }
 
-void ListInsertData(List* list, void* newData) {
+void ListInsertData(List* pList, void* pNewData) {
 	// create Node  and insert Data.
-	Node* newNode = ListCreateNode();
-	newNode->pData = newData;
+	Node* pNewNode = ListCreateNode();
+	pNewNode->pData = pNewData;
 	
 	// Node insert to List.
-	if (list->pTail == NULL) {
-		list->pTail = list->pHead = newNode;
+	if (pList->pTail == NULL) {
+		pList->pTail = pList->pHead = pNewNode;
 	} else {
-		list->pTail->pNext = newNode;
-		newNode->pPrev = list->pTail;
-		list->pTail = newNode;
+		pList->pTail->pNext = pNewNode;
+		pNewNode->pPrev = pList->pTail;
+		pList->pTail = pNewNode;
 	}
-	list->size++;
+	pList->nSize++;
 }
 
-void ListRemoveNode(List* list, Node* removeNode) {
+Node* ListRemoveNode(List* pList, Node* pRemoveNode) {
+	Node* pNextNode = NULL;
 	// Node remove from List.
-	if (list->pTail == NULL) {
-		return;
-	} else {
-		// don't care NULL.
-		if (removeNode->pPrev != NULL) {
-			removeNode->pPrev->pNext = removeNode->pNext;
+	if (pList->pTail != NULL) {
+		if (pRemoveNode->pPrev != NULL) {
+			pRemoveNode->pPrev->pNext = pRemoveNode->pNext;
 		}
-		if (removeNode->pNext != NULL) {
-			removeNode->pNext->pPrev = removeNode->pPrev;
+		if (pRemoveNode->pNext != NULL) {
+			pRemoveNode->pNext->pPrev = pRemoveNode->pPrev;
 		}
-		removeNode->pNext = removeNode->pPrev = NULL;
+		
+		pNextNode = pRemoveNode->pNext;
+		pRemoveNode->pNext = pRemoveNode->pPrev = NULL;
+		
+		pList->nSize--;
+		if (pList->nSize <= 0) {
+			pList->pHead = pList->pTail = NULL;
+		}
 	}
-	list->size--;
+	return pNextNode;
 }
 
 Node* ListPopHead(List* pList) {
 	Node* pNode = pList->pHead;
 	if (pNode != NULL) {
 		pList->pHead = pNode->pNext;
-	} else {
-		pList->pHead = NULL;
+		pList->nSize--;
+		
+		pNode->pNext = pNode->pPrev = NULL;
 	}
 	return pNode;
 }

@@ -5,104 +5,103 @@
 #include "Dyeing.h"
 #include "List.h"
 
-#define WIDTH    9
-#define HEIGHT   8
-
-//char DyeingSpot[HEIGHT][WIDTH] = {
-//	0, 0, 0, 0, 0, 0, 0, 0, 0,
-//	0, 0, 0, 1, 1, 0, 1, 1, 0,
-//	0, 0, 0, 1, 1, 0, 1, 1, 0,
-//	0, 1, 1, 1, 1, 1, 1, 1, 0,
-//	0, 1, 1, 1, 1, 1, 1, 1, 0,
-//	0, 1, 1, 1, 0, 1, 1, 0, 0,
-//	0, 1, 1, 0, 0, 1, 1, 0, 0,
-//	0, 0, 0, 0, 0, 0, 0, 0, 0
-//};
-//enum Color {
-//	WHITE=0, GRAY=1, CHANGE=2
-//};
-//
-//int DyeingIsColored(char spot[][WIDTH]);
+struct AA {
+	int A;
+};
 
 int main() {
-	char *current;
 
 	int h, w;
-	int count = 0, color_count=0;
+	int nCount, nColoredNearbyCount=0;
 	int data = 10;
+	List* pColoredList = ListCreate();
+	Node* pCurrentNode;
+	Node* pNexttNode;
+	char* pCurrentSpot;
 	
-	// test 
-	List* list = ListCreate();
-	
-	ListInsertData(list, &data);
-	
-	printf("list size : %d\n", list->size);
-	printf("list head : %d\n", *(int*)(list->pHead->pData));
-//	
-//	for (w=0; w<1000000; w++) {
-//		ListInsertData(list, &w);
-//	}
-//	printf("list size : %d\n", list->size);
-//	system("pause");
-	
-	ListFree(&list);
-	system("pause");
-
-//	while ( !isColored(spot) ) {
-//		count ++;
-//
-//		// print console
-//		printf("\n %d초 경과후의 예상결과\n", count);
-//		printf("　┌─────────┐\n");
-//		for (h=0; h<HEIGHT; h++) {
-//			printf("　│");
-//			for (w=0; w<WIDTH; w++) {
-//				current = &spot[h][w];
-//				
-//				if (*current == WHITE || *current == CHANGE) {
-//					*current = WHITE;
-//					printf("■");
-//				} else { // GRAY 
-//					color_count = 0;
-//
-//					if (w>0 && w<WIDTH-1 && h>0 && h<HEIGHT-1) {
-//						if (*(current-1) != GRAY) color_count++;
-//						if (*(current+1) != GRAY) color_count++;
-//						if (*(current-WIDTH) != GRAY) color_count++;
-//						if (*(current+WIDTH) != GRAY) color_count++;
-//					}
-//
-//					if (color_count >= 2) {
-//						*current = CHANGE;
-//						printf("▨");
-//					} else {
-//						*current = CHANGE;
-//						printf("　");
-//					}
-//				}
-//			}
-//			printf("│\n");
+//	// test.
+//	for (w=0; w<5; w++) {
+//		struct AA* a = calloc(1, sizeof(struct AA));
+//		a->A = w;
+//		ListInsertData(pColoredList, a);
+//		
+//		pCurrentNode = pColoredList->pHead;
+//		while (pCurrentNode != NULL) {
+//			printf("[%d]->", *(int*)pCurrentNode->pData);
+//			pCurrentNode = pCurrentNode->pNext;
 //		}
-//		printf("　└─────────┘\n");
-//
-//		//Sleep(1000);       // break time
-//		system("pause");
-//		system("cls");     // console clear
+//		printf("\n");
 //	}
-//	printf("총 걸린 시간은 : %d초 입니다\n", count);
+//	
+//	pCurrentNode = pColoredList->pHead;
+//	while (pCurrentNode != NULL) {
+//		pNexttNode = pCurrentNode;
+//		while (pCurrentNode != NULL) {
+//			printf("[%d]->", *(int*)pCurrentNode->pData);
+//			pCurrentNode = pCurrentNode->pNext;
+//		}
+//		printf("\n");
+//		pCurrentNode = pNexttNode;
+//		
+//		pNexttNode = ListRemoveNode(pColoredList, pCurrentNode);
+//		ListFreeNode(&pCurrentNode);
+//		pCurrentNode = pNexttNode;
+//	}
+//	
+//	printf("\nafter... size:%d\n", pColoredList->nSize);
+	
+//	printf("%d\n", sizeof(List) == sizeof(*pColoredList));
+	
+	// insert spot into list.
+	for (h=0; h<DYEING_HEIGHT; h++) {
+		for (w=0; w<DYEING_WIDTH; w++) {
+			if (aDyeingSpot[h][w] == GRAY) {
+				ListInsertData(pColoredList, &aDyeingSpot[h][w]);
+			}
+		} // end of width loop.
+	} // end of height loop.
+	
+	
+	nCount = 0;
+	while ( pColoredList->nSize > 0 ) {
+	printf("손수건의 더러운 곳의 수: %d\n", pColoredList->nSize);
+		nCount ++;
+		
+		// looping until last node.
+		pCurrentNode = pColoredList->pHead;
+		while (pCurrentNode != NULL) {
+			pCurrentSpot = (char*)pCurrentNode->pData;
+			
+			nColoredNearbyCount = 0;
+			if ( *(pCurrentSpot-1)            == WHITE ) nColoredNearbyCount++;
+			if ( *(pCurrentSpot+1)            == WHITE ) nColoredNearbyCount++;
+			if ( *(pCurrentSpot-DYEING_WIDTH) == WHITE ) nColoredNearbyCount++;
+			if ( *(pCurrentSpot+DYEING_WIDTH) == WHITE ) nColoredNearbyCount++;
+			// left, right, up, down.
+			
+			if (nColoredNearbyCount >= 2) {
+				*pCurrentSpot = CHANGE;
+				// pCurrentNode is next node.
+				pNexttNode = ListRemoveNode(pColoredList, pCurrentNode);
+				ListFreeNode(&pCurrentNode);
+				pCurrentNode = pNexttNode;
+				continue;
+			}
+			
+			pCurrentNode = pCurrentNode->pNext;
+		}
+		
+		printf("\n %d초 경과후의 예상결과\n", nCount);
+		DisplayHandkerchief(aDyeingSpot);
+
+		//Sleep(1000);       // break time
+		system("pause");
+		system("cls");     // console clear
+	} // end of list loop.
+	printf("총 걸린 시간은 : %d초 입니다\n", nCount);
+
+	ListFree(&pColoredList);
 
 	return 0;
-}
-
-int isColored(char spot[][WIDTH]) {
-	int w, h;
-	for (h=1; h<HEIGHT-1; h++) {
-		for (w=1; w<WIDTH-1; w++) {
-			if (spot[h][w]) {
-				return 0;
-			}
-		}
-	}
-	return 1;
 }
 

@@ -16,16 +16,16 @@ typedef struct Node {
 typedef struct List {
 	Node* pHead;
 	Node* pTail;
-	int size;
+	int nSize;
 } List ;
 
 List* ListCreate();
 Node* ListCreateNode();
 void ListFree(List** ppList);
-void ListFreeNode(List* pList, Node** ppNode);
+void ListFreeNode(Node** ppNode);
 
-void ListInsertData(List* pList, void* newData);
-void ListRemoveNode(List* pList, Node* pRemoveNode);
+void ListInsertData(List* pList, void* pNewData);
+Node* ListRemoveNode(List* pList, Node* pRemoveNode);
 Node* ListPopHead(List* pList);
 
 #endif
