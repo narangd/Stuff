@@ -21,10 +21,12 @@ void ListFree(List** ppList) {
 void ListFreeNode(Node** ppNode) {
 	Node* pNode = *ppNode;
 	if (pNode != NULL) {
-		pNode->pNext = pNode->pPrev = pNode->pData = NULL;
+		pNode->pNext = NULL;
+		pNode->pPrev = NULL;
+		pNode->pData = NULL;
+		free(pNode); // free Node.
+		pNode = NULL;
 	}
-	free(pNode);
-	pNode = NULL;
 }
 
 void ListInsertData(List* pList, void* pNewData) {
@@ -34,7 +36,8 @@ void ListInsertData(List* pList, void* pNewData) {
 	
 	// Node insert to List.
 	if (pList->pTail == NULL) {
-		pList->pTail = pList->pHead = pNewNode;
+		pList->pTail = pNewData;
+		pList->pHead = pNewNode;
 	} else {
 		pList->pTail->pNext = pNewNode;
 		pNewNode->pPrev = pList->pTail;
@@ -46,7 +49,7 @@ void ListInsertData(List* pList, void* pNewData) {
 Node* ListRemoveNode(List* pList, Node* pRemoveNode) {
 	Node* pNextNode = NULL;
 	// Node remove from List.
-	if (pList->pTail != NULL) {
+	if (pRemoveNode != NULL) {
 		if (pRemoveNode->pPrev != NULL) {
 			pRemoveNode->pPrev->pNext = pRemoveNode->pNext;
 		}
@@ -55,25 +58,28 @@ Node* ListRemoveNode(List* pList, Node* pRemoveNode) {
 		}
 		
 		pNextNode = pRemoveNode->pNext;
-		pRemoveNode->pNext = pRemoveNode->pPrev = NULL;
+		pRemoveNode->pNext = NULL;
+		pRemoveNode->pPrev = NULL;
 		
 		pList->nSize--;
 		if (pList->nSize <= 0) {
-			pList->pHead = pList->pTail = NULL;
+			pList->pHead = NULL;
+			pList->pTail = NULL;
 		}
 	}
 	return pNextNode;
 }
 
 Node* ListPopHead(List* pList) {
-	Node* pNode = pList->pHead;
-	if (pNode != NULL) {
-		pList->pHead = pNode->pNext;
+	Node* pHeadNode = pList->pHead;
+	if (pHeadNode != NULL) {
+		pList->pHead = pHeadNode->pNext;
 		pList->nSize--;
 		
-		pNode->pNext = pNode->pPrev = NULL;
+		pHeadNode->pNext = NULL;
+		pHeadNode->pPrev = NULL;
 	}
-	return pNode;
+	return pHeadNode;
 }
 //Node* ListPop(List* list) {
 //	
