@@ -36,7 +36,7 @@ void ListInsertData(List* pList, void* pNewData) {
 	
 	// Node insert to List.
 	if (pList->pTail == NULL) {
-		pList->pTail = pNewData;
+		pList->pTail = pNewNode;
 		pList->pHead = pNewNode;
 	} else {
 		pList->pTail->pNext = pNewNode;
@@ -49,11 +49,15 @@ void ListInsertData(List* pList, void* pNewData) {
 Node* ListRemoveNode(List* pList, Node* pRemoveNode) {
 	Node* pNextNode = NULL;
 	// Node remove from List.
-	if (pRemoveNode != NULL) {
-		if (pRemoveNode->pPrev != NULL) {
+	if (pRemoveNode != NULL && pList->pHead != NULL) {
+		if (pRemoveNode->pPrev == NULL) {
+			pList->pHead = pRemoveNode->pNext;
+		} else {
 			pRemoveNode->pPrev->pNext = pRemoveNode->pNext;
 		}
-		if (pRemoveNode->pNext != NULL) {
+		if (pRemoveNode->pNext == NULL) {
+			pList->pTail = pRemoveNode->pPrev;
+		} else {
 			pRemoveNode->pNext->pPrev = pRemoveNode->pPrev;
 		}
 		
@@ -62,10 +66,6 @@ Node* ListRemoveNode(List* pList, Node* pRemoveNode) {
 		pRemoveNode->pPrev = NULL;
 		
 		pList->nSize--;
-		if (pList->nSize <= 0) {
-			pList->pHead = NULL;
-			pList->pTail = NULL;
-		}
 	}
 	return pNextNode;
 }
