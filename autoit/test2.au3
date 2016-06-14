@@ -1,14 +1,4 @@
-#include <MsgBoxConstants.au3>
-#include <WinAPI.au3>
-#include <WindowsConstants.au3>
+; This will create a tooltip in the upper left of the screen
 
-Example()
-
-Func Example()
-    Local $hWnd, $hParent
-    $hWnd = GUICreate("test")
-    $hParent = _WinAPI_GetAncestor($hWnd, $GA_PARENT)
-    MsgBox($MB_SYSTEMMODAL, "Parent", "Get Ancestor of " & $hWnd & ": " & $hParent)
-    MsgBox($MB_SYSTEMMODAL, "Root", "Get Ancestor of " & $hParent & ": " & _WinAPI_GetAncestor($hWnd, $GA_ROOT))
-    MsgBox($MB_SYSTEMMODAL, "Root Owner", "Get Ancestor of " & $hParent & ": " & _WinAPI_GetAncestor($hWnd, $GA_ROOTOWNER))
-EndFunc   ;==>Example
+TrayTip('title', "This is a tooltip", 1000, 1)
+Sleep(2000) ; Sleep to give tooltip time to display
